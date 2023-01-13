@@ -8,36 +8,50 @@ from .models import *
 from .sms import smsVerification
 
 
-
 @api_view(['POST'])
 def registration_view(request):
     account_serializer = PhoneSerializer(data=request.data)
     data = {}
-    
+
     if account_serializer.is_valid():
         account = account_serializer
         number = account.data['phone_number']
         account = Account.objects.filter(phone_number=number)
         if account:
-            print(f"The user exists.")
             user_account = Account.objects.get(phone_number=number)
             user_code = Code.objects.get(user = user_account)
-            print(f"Existing user is {user_account.phone_number} with code, {user_code.verification_code}")
-            data = f"User {user_account.phone_number},{user_code.verification_code} is logged in"
+            data = user_code
             return Response(data,status = status.HTTP_200_OK)
         else:
             print("User does not exist.")
             Account.objects.create(phone_number=number)
             new_account = Account.objects.get(phone_number=number)
             new_code = Code.objects.get(user = new_account)
-            print(f"New user, {new_account.phone_number} has been created with code {new_code.verification_code}")
-            data = f"User {new_account.phone_number},{new_code.verification_code} has been created and logged in"
+            data = new_code
             return Response(data,status = status.HTTP_201_CREATED)
         
     else:
         data = account_serializer.errors
         return Response(data,status = status.HTTP_400_BAD_REQUEST)
 
- 
+@api_view(['POST'])
+def verification_view(request):
+    code_serializer = CodeSerializer(data=request.data)
+    data = {}
+
+    if code_serializer.is_valid():
+        user_code = code_serializer
+        user_number = user_code.data['phone_number']
+        verify_code = user_code.data['code']
+        user = Account.objects.get(phone_number=user_number)
+        user_code = Code.objects.get(user=user) 
+        if verify_code == user_code.verification_code:
+            data = "Account has successfully verified"
+            return Response(data,status = status.HTTP_200_OK)
+        elif verify_code != user_code.verification_code:
+            data = "Verification code did not match account."
+            return Response(data,status = status.HTTP_400_BAD_REQUEST)
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
 
         
