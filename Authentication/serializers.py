@@ -26,14 +26,14 @@ class PhoneSerializer(serializers.Serializer):
     def get_number(self):
         phone_number = self.validated_data['phone_number']
         return phone_number
-class CodeSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    class Meta:
-        model =  Code
-        fields = ["verification_code","user"]
-
-    def save(self,request):
-        code = Code(verification_code=self.validated_data['verification_code'],user=request.user)
-        print(f"Code for {code.user.phone_number},{code.verification_code} has been created.")
-        code.save()
-        return code
+class CodeSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(
+        max_length=15,
+        )
+    code = serializers.CharField(
+        max_length=5,
+        )
+    def get_code(self):
+        phone_number = self.validated_data['phone_number']
+        code = self.validated_data['code']
+        return phone_number,code
