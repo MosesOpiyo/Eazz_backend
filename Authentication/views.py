@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view,permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+import json
 
 from .serializers import *
 from .models import *
@@ -20,14 +21,18 @@ def registration_view(request):
         if account:
             user_account = Account.objects.get(phone_number=number)
             user_code = Code.objects.get(user = user_account)
-            data = user_code
+            smsVerification(number,user_code.verification_code)
+            token, created = Token.objects.get_or_create(user=user_account)
+            data['user'] = UserSerializer(user_account).data,{"token":token.key}
             return Response(data,status = status.HTTP_200_OK)
         else:
             print("User does not exist.")
             Account.objects.create(phone_number=number)
             new_account = Account.objects.get(phone_number=number)
             new_code = Code.objects.get(user = new_account)
-            data = new_code
+            smsVerification(number,new_code.verification_code)
+            token, created = Token.objects.get_or_create(user=new_account)
+            data['user'] = UserSerializer(new_account).data,{"token":token.key}
             return Response(data,status = status.HTTP_201_CREATED)
         
     else:
