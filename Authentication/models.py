@@ -44,10 +44,11 @@ class Account(AbstractBaseUser,PermissionsMixin):
     Args:
         AbstractBaseUser ([type]): [description]
     """
-
+    id = models.AutoField(primary_key=True),
     phone_number = models.CharField(
         verbose_name="phone number",
         max_length=15,
+        null=True,
         unique=True
         )
     date_joined = models.DateTimeField(
@@ -80,6 +81,16 @@ class Account(AbstractBaseUser,PermissionsMixin):
     def delete_user(self):
         self.delete()
 
+from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
+
 class Code(models.Model):
     verification_code = models.CharField(max_length=5,
     verbose_name="code",
@@ -103,10 +114,11 @@ class Code(models.Model):
         for i in range(5):
             num = random.choice(number_list)
             code_items.append(num)
-
         code_to_string = "".join(str(item) for item in code_items)
         self.verification_code = code_to_string
         super().save(*args,**kwargs)
+        return self.verification_code
+    
 
 
 
