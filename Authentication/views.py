@@ -22,18 +22,14 @@ def registration_view(request):
             user_account = Account.objects.get(phone_number=number)
             user_code = Code.objects.get(user = user_account)
             smsVerification(number,user_code.verification_code)
-            token, created = Token.objects.get_or_create(user=user_account)
-            data['user'] = UserSerializer(user_account).data,{"token":token.key}
-            return Response(data,status = status.HTTP_200_OK)
+            return Response(status = status.HTTP_200_OK)
         else:
             print("User does not exist.")
             Account.objects.create(phone_number=number)
             new_account = Account.objects.get(phone_number=number)
             new_code = Code.objects.get(user = new_account)
             smsVerification(number,new_code.verification_code)
-            token, created = Token.objects.get_or_create(user=new_account)
-            data['user'] = UserSerializer(new_account).data,{"token":token.key}
-            return Response(data,status = status.HTTP_201_CREATED)
+            return Response(status = status.HTTP_201_CREATED)
         
     else:
         data = account_serializer.errors
@@ -51,7 +47,8 @@ def verification_view(request):
         user = Account.objects.get(phone_number=user_number)
         user_code = Code.objects.get(user=user) 
         if verify_code == user_code.verification_code:
-            data = "Account has successfully verified"
+            token, created = Token.objects.get_or_create(user=user)
+            data['user'] = UserSerializer(user).data,{"token":token.key}
             return Response(data,status = status.HTTP_200_OK)
         elif verify_code != user_code.verification_code:
             data = "Verification code did not match account."
