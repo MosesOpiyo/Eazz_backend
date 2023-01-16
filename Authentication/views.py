@@ -1,5 +1,6 @@
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework import status
 import json
@@ -22,14 +23,16 @@ def registration_view(request):
             user_account = Account.objects.get(phone_number=number)
             user_code = Code.objects.get(user = user_account)
             smsVerification(number,user_code.verification_code)
-            return Response(status = status.HTTP_200_OK)
+            data = f"{user_account.phone_number} has been logged in"
+            return Response(data,status = status.HTTP_200_OK)
         else:
             print("User does not exist.")
             Account.objects.create(phone_number=number)
             new_account = Account.objects.get(phone_number=number)
             new_code = Code.objects.get(user = new_account)
             smsVerification(number,new_code.verification_code)
-            return Response(status = status.HTTP_201_CREATED)
+            data = f"{new_account.phone_number} has been registered and logged in"
+            return Response(data,status = status.HTTP_201_CREATED)
         
     else:
         data = account_serializer.errors
@@ -51,7 +54,7 @@ def verification_view(request):
             data['user'] = UserSerializer(user).data,{"token":token.key}
             return Response(data,status = status.HTTP_200_OK)
         elif verify_code != user_code.verification_code:
-            data = "Verification code did not match account."
+            data['error'] = "Verification code did not match account."
             return Response(data,status = status.HTTP_400_BAD_REQUEST)
         return Response(status = status.HTTP_404_NOT_FOUND)
 
