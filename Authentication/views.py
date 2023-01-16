@@ -58,5 +58,14 @@ def verification_view(request):
             return Response(data,status = status.HTTP_400_BAD_REQUEST)
         return Response(status = status.HTTP_404_NOT_FOUND)
 
+@api_view(['GET'])
+def get_profile(request):
+    data = {}
+    print(request.user)
+    profile = Code.objects.get(user = request.user)
+    data =  ProfileSerializer(profile).data
+    print(data)
+    return Response(data,status = status.HTTP_200_OK)
+
 
         

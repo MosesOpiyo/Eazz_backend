@@ -5,5 +5,6 @@ from rest_framework.authtoken import views as special_views
 urlpatterns = [
     path('registration', Authenticated_users.registration_view,name="registration"),
     path('verification', Authenticated_users.verification_view,name="verification"),
+    path('user_profile',Authenticated_users.get_profile,name="user_profile")
     
 ]

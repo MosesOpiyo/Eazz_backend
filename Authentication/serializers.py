@@ -37,3 +37,15 @@ class CodeSerializer(serializers.Serializer):
         phone_number = self.validated_data['phone_number']
         code = self.validated_data['code']
         return phone_number,code
+
+class GetCodeSerializer(serializers.Serializer):
+    class Meta:
+        model = Code
+        fields = '__all__'
+
+class ProfileSerializer(serializers.Serializer):
+    user = UserSerializer(read_only=True)
+    code = GetCodeSerializer(read_only=True)
+    class Meta:
+        model = Code
+        fields = '__all__'
