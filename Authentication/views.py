@@ -23,7 +23,7 @@ def registration_view(request):
             user_account = Account.objects.get(phone_number=number)
             user_code = Code.objects.get(user = user_account)
             smsVerification(number,user_code.verification_code)
-            data = f"{user_account.phone_number} has been logged in"
+            data['response'] = f"User has been logged in under {user_account.phone_number}"
             return Response(data,status = status.HTTP_200_OK)
         else:
             print("User does not exist.")
@@ -31,7 +31,7 @@ def registration_view(request):
             new_account = Account.objects.get(phone_number=number)
             new_code = Code.objects.get(user = new_account)
             smsVerification(number,new_code.verification_code)
-            data = f"{new_account.phone_number} has been registered and logged in"
+            data['response'] = f"User has been registered and logged in under {new_account.phone_number}"
             return Response(data,status = status.HTTP_201_CREATED)
         
     else:
@@ -51,8 +51,7 @@ def verification_view(request):
         user_code = Code.objects.get(user=user) 
         if verify_code == user_code.verification_code:
             token, created = Token.objects.get_or_create(user=user)
-            data['user'] = UserSerializer(user).data,{"token":token.key}
-            return Response(data,status = status.HTTP_200_OK)
+            return Response({"token":token.key})
         elif verify_code != user_code.verification_code:
             data['error'] = "Verification code did not match account."
             return Response(data,status = status.HTTP_400_BAD_REQUEST)
@@ -68,4 +67,4 @@ def get_profile(request):
     return Response(data,status = status.HTTP_200_OK)
 
 
-        
+

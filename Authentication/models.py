@@ -118,6 +118,13 @@ class Code(models.Model):
         self.verification_code = code_to_string
         super().save(*args,**kwargs)
         return self.verification_code
+
+class Username(models.Model):
+    username = models.CharField(max_length=1000)
+    code = models.OneToOneField(Code, on_delete=CASCADE)
+
+    def __str__(self):
+        return self.username
     
 
 
