@@ -63,6 +63,11 @@ class Account(AbstractBaseUser,PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    username = models.CharField(
+        max_length=500,
+        blank=True,
+        null=True,
+    )
 
     objects = MyAccountManager()
 
@@ -80,6 +85,7 @@ class Account(AbstractBaseUser,PermissionsMixin):
 
     def delete_user(self):
         self.delete()
+
 
 from django.conf import settings
 from django.db.models.signals import post_save
@@ -119,12 +125,7 @@ class Code(models.Model):
         super().save(*args,**kwargs)
         return self.verification_code
 
-class Username(models.Model):
-    username = models.CharField(max_length=1000)
-    code = models.OneToOneField(Code, on_delete=CASCADE)
 
-    def __str__(self):
-        return self.username
     
 
 
