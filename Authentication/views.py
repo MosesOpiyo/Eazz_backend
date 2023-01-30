@@ -68,11 +68,10 @@ def username_view(request):
         user = Account.objects.get(phone_number=request.user.phone_number)
         user.username = user_name
         user.save()
-        data['success'] = f"Username {user.username}, added."
+        data['user'] = UserSerializer(user).data
+        print(data)
     return Response(data,status = status.HTTP_200_OK)
         
-        
-
 @api_view(['GET'])
 def get_profile(request):
     data = {}
