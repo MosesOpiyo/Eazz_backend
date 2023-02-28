@@ -11,13 +11,14 @@ class ItemsSerializers(serializers.ModelSerializer):
 
 class ReceiptSerializers(serializers.ModelSerializer):
     items = ItemsSerializers(many=True)
+    customer = UserSerializer(read_only=True)
     class Meta:
         model = Receipts
         fields = '__all__'
 
-    def create(self,validated_data):
+    def create(self,request,validated_data):
         item_data = validated_data.pop('items')
-        receipt = Receipts.objects.create(**validated_data)
+        receipt = Receipts.objects.create(customer=request.user,**validated_data)
         for item_data in item_data:
           items = Items.objects.create(
             name = item_data.get('name'),
@@ -31,6 +32,7 @@ class ReceiptSerializers(serializers.ModelSerializer):
 
 class GetReceiptSerializers(serializers.ModelSerializer):
     items = ItemsSerializers(many=True)
+    customer = UserSerializer(read_only=True)
     class Meta:
         model = Receipts
-        fields = ['receipt_number','server','items']
+        fields = ['receipt_number','server','customer','items']

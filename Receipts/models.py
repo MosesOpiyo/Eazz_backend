@@ -13,7 +13,8 @@ class Items(models.Model):
 
 class Receipts(models.Model):
     receipt_number = models.CharField(max_length=6,null=True)
-    server = models.CharField(max_length=10,null=True) 
+    server = models.CharField(max_length=10,null=True)
+    customer = models.OneToOneField(Account,on_delete=models.CASCADE,null=True) 
     items = models.ManyToManyField(Items)
 
     def __str__(self):
