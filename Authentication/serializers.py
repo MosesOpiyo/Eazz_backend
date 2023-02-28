@@ -17,7 +17,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ['id','phone_number','date_joined','last_login']
+        fields = ['id','phone_number','date_joined','last_login','username']
 
 class PhoneSerializer(serializers.Serializer):
     phone_number = serializers.CharField(
@@ -38,14 +38,20 @@ class CodeSerializer(serializers.Serializer):
         code = self.validated_data['code']
         return phone_number,code
 
+class UsernameSerializer(serializers.Serializer):
+    username = serializers.CharField(
+        max_length=1000,
+        )
+    def save(self,request):
+        username = Account(username=self.validated_data['username'])
+        username.save()
+        return username
+
+
 class GetCodeSerializer(serializers.Serializer):
     class Meta:
         model = Code
         fields = '__all__'
 
 class ProfileSerializer(serializers.Serializer):
-    user = UserSerializer(read_only=True)
-    code = GetCodeSerializer(read_only=True)
-    class Meta:
-        model = Code
-        fields = '__all__'
+    user = UserSerializer(read_only=True) 

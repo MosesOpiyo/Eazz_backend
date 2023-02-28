@@ -57,13 +57,26 @@ def verification_view(request):
             return Response(data,status = status.HTTP_400_BAD_REQUEST)
         return Response(status = status.HTTP_404_NOT_FOUND)
 
+@api_view(['POST'])
+def username_view(request):
+    username_serializer = UsernameSerializer(data=request.data)
+    data = {}
+
+    if username_serializer.is_valid():
+        user = username_serializer
+        user_name = user.data['username']
+        user = Account.objects.get(phone_number=request.user.phone_number)
+        user.username = user_name
+        user.save()
+        data['user'] = UserSerializer(user).data
+        print(data)
+    return Response(data,status = status.HTTP_200_OK)
+        
 @api_view(['GET'])
 def get_profile(request):
     data = {}
-    print(request.user)
-    profile = Code.objects.get(user = request.user)
-    data =  ProfileSerializer(profile).data
-    print(data)
+    account = Code.objects.get(user=request.user)
+    data =  ProfileSerializer(account).data
     return Response(data,status = status.HTTP_200_OK)
 
 
