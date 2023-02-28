@@ -4,18 +4,19 @@ import os
 
 from Authentication.models import Account
 
-class Items(models.Model):
+class Item(models.Model):
     name = models.TextField(null=True)
-    quantity = models.CharField(max_length=3,null=True) 
-    amount = models.CharField(max_length=10,null=True)
+    quantity = models.IntegerField(null=True) 
+    amount = models.IntegerField(null=True)
     def __str__(self):
        return self.name
 
-class Receipts(models.Model):
+class Receipt(models.Model):
     receipt_number = models.CharField(max_length=6,null=True)
     server = models.CharField(max_length=10,null=True)
-    customer = models.OneToOneField(Account,on_delete=models.CASCADE,null=True) 
-    items = models.ManyToManyField(Items)
+    customer_id = models.IntegerField(null=True)
+    customer_name = models.CharField(max_length=10,null=True)
+    items = models.ManyToManyField(Item)
 
     def __str__(self):
         return self.receipt_number

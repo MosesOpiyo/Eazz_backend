@@ -15,14 +15,20 @@ def receipt_view(request):
         receipt_serializer.save()
         data =  GetReceiptSerializers(request.data).data
         return Response(data,status=status.HTTP_201_CREATED)
-
     else:
         return Response(status=status.HTTP_204_NO_CONTENT) 
 
 @api_view(['GET']) 
 def get_receipts(request):
     data = {}
-    receipt = Receipts.objects.all()
+    receipt = Receipt.objects.all()
+    data =  GetReceiptSerializers(receipt,many=True).data
+    return Response(data,status = status.HTTP_200_OK)
+
+@api_view(['GET']) 
+def get_user_receipts(request):
+    data = {}
+    receipt = Receipt.objects.get(customer_id=request.user.id)
     data =  GetReceiptSerializers(receipt,many=True).data
     return Response(data,status = status.HTTP_200_OK)
 
