@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'Authentication',
     'Receipts',
-    'TranscationRecords',
+    'TransactionRecords',
     'rest_auth',
 ]
 
