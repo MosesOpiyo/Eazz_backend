@@ -1,10 +1,15 @@
 from django.db import models
 from Authentication.models import Account
-from Receipts.models import Receipts
+from Receipts.models import Receipt
+import binascii
+import os
 
-class Records(models.Model):
-    customer = models.OneToOneField(Account,null=True,on_delete=models.CASCADE)
-    receipt = models.OneToOneField(Receipts,null=True,on_delete=models.CASCADE)
+class Record(models.Model):
+    customer_id = models.IntegerField(null=True)
+    receipt = models.CharField(max_length=6,null=True)
     server = models.CharField(max_length=10,null=True)
     amount = models.CharField(max_length=10,null=True)
     date = models.DateField(auto_now=True,null=True)
+
+    def __str__(self):
+        return self.amount
