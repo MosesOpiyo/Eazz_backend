@@ -12,6 +12,7 @@ class Item(models.Model):
        return self.name
 
 class Receipt(models.Model):
+    id = models.AutoField(primary_key=True)
     receipt_number = models.CharField(max_length=6,null=True)
     server = models.CharField(max_length=10,null=True)
     customer_id = models.IntegerField(null=True)

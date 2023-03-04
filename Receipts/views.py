@@ -12,9 +12,11 @@ def receipt_view(request):
     receipt_serializer = ReceiptSerializers(data=request.data)
     data = {}
     if receipt_serializer.is_valid():
+        
         receipt_serializer.save()
-        data =  GetReceiptSerializers(request.data).data
-        return Response(data,status=status.HTTP_201_CREATED)
+        receipt = receipt_serializer
+        data = receipt.data['id']
+        return Response(data=data,status=status.HTTP_201_CREATED)
     else:
         return Response(status=status.HTTP_204_NO_CONTENT) 
 
@@ -26,10 +28,10 @@ def get_receipts(request):
     return Response(data,status = status.HTTP_200_OK)
 
 @api_view(['GET']) 
-def get_user_receipts(request):
+def get_user_receipts(request,pk):
     data = {}
-    receipt = Receipt.objects.get(customer_id=request.user.id)
-    data =  GetReceiptSerializers(receipt,many=True).data
+    receipt = Receipt.objects.get(pk=pk)
+    data =  GetReceiptSerializers(receipt).data
     return Response(data,status = status.HTTP_200_OK)
 
    
