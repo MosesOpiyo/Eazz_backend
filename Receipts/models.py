@@ -1,37 +1,34 @@
 from django.db import models
 import binascii
 import os
+from datetime import datetime
 
 from Authentication.models import Account
 
 class Item(models.Model):
     name = models.TextField(null=True)
-    quantity = models.IntegerField(null=True) 
-    amount = models.IntegerField(null=True)
+    item_number = models.IntegerField(null=True) 
+    price = models.IntegerField(null=True)
     def __str__(self):
        return self.name
-
+    
 class Receipt(models.Model):
-    id = models.AutoField(primary_key=True)
-    receipt_number = models.CharField(max_length=6,null=True)
-    server = models.CharField(max_length=10,null=True)
-    customer_id = models.IntegerField(null=True)
-    customer_name = models.CharField(max_length=10,null=True)
+    receipt_number = models.CharField(max_length=12,null=True)
+    server_name = models.CharField(max_length=40,null=True)
+    store_name = models.CharField(max_length=100,null=True)
+    total = models.IntegerField(null=True)
     items = models.ManyToManyField(Item)
 
     def __str__(self):
-        return self.receipt_number
+        return str(self.receipt_number)
     
-    def save(self, *args, **kwargs):
-        if not self.receipt_number:
-            self.receipt_number = self.generate_number()
-        return super().save(*args, **kwargs)
+class Statement(models.Model):
+    receipt = models.ForeignKey(Receipt,on_delete=models.CASCADE,null=True)
+    client = models.TextField(null=True)
+    code = models.IntegerField(null=True)
     
-    @classmethod
-    def generate_number(cls):
-        return binascii.hexlify(os.urandom(6)).decode()
-    
-
+    def __str__(self):
+        return self.client
 
 
 

@@ -12,11 +12,17 @@ def receipt_view(request):
     receipt_serializer = ReceiptSerializers(data=request.data)
     data = {}
     if receipt_serializer.is_valid():
-        
         receipt_serializer.save()
-        receipt = receipt_serializer
-        data = receipt.data['id']
-        return Response(data=data,status=status.HTTP_201_CREATED)
+        data = receipt_serializer.data['id'] 
+        receipt = Receipt.objects.get(id=receipt_serializer.data['id'])
+        print(request.user)
+        statement = Statement.objects.create(
+            receipt = receipt,
+            client = request.user.username,
+            code = request.user.id
+        )
+        statement.save()
+        return Response(data,status=status.HTTP_201_CREATED)
     else:
         return Response(status=status.HTTP_204_NO_CONTENT) 
 
@@ -28,10 +34,17 @@ def get_receipts(request):
     return Response(data,status = status.HTTP_200_OK)
 
 @api_view(['GET']) 
-def get_user_receipts(request,pk):
+def get_user_receipts(request,id):
     data = {}
-    receipt = Receipt.objects.get(pk=pk)
-    data =  GetReceiptSerializers(receipt).data
+    receipts = Receipt.objects.get(id=id)
+    data =  GetReceiptSerializers(receipts).data
+    return Response(data,status = status.HTTP_200_OK)
+
+@api_view(['GET']) 
+def get_statements(request):
+    data = {}
+    statements = Statement.objects.filter(code=request.user.id)
+    data =  GetStatementsSerializers(statements,many=True).data
     return Response(data,status = status.HTTP_200_OK)
 
    
