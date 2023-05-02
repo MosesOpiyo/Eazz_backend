@@ -1,28 +1,28 @@
 from rest_framework import serializers
+from Authentication.models import Account
 
-from .models import Items,Receipts
+from .models import Item,Receipt,Statement
 from Authentication.serializers import UserSerializer
 
 class ItemsSerializers(serializers.ModelSerializer):
     class Meta:
-        model = Items
-        fields = ['name','quantity','amount']
-
+        model = Item
+        fields = "__all__"
 
 class ReceiptSerializers(serializers.ModelSerializer):
     items = ItemsSerializers(many=True)
     class Meta:
-        model = Receipts
-        fields = '__all__'
+        model = Receipt
+        fields = "__all__"
 
     def create(self,validated_data):
         item_data = validated_data.pop('items')
-        receipt = Receipts.objects.create(**validated_data)
+        receipt = Receipt.objects.create(**validated_data)
         for item_data in item_data:
-          items = Items.objects.create(
+          items = Item.objects.create(
             name = item_data.get('name'),
-            quantity = item_data.get('quantity'),
-            amount = item_data.get('amount')
+            item_number = item_data.get('item_number'),
+            price = item_data.get('price')
           )
           receipt.items.add(items)
         receipt.save()
@@ -32,5 +32,11 @@ class ReceiptSerializers(serializers.ModelSerializer):
 class GetReceiptSerializers(serializers.ModelSerializer):
     items = ItemsSerializers(many=True)
     class Meta:
-        model = Receipts
-        fields = ['receipt_number','server','items']
+        model = Receipt
+        fields = "__all__"
+
+class GetStatementsSerializers(serializers.ModelSerializer):
+    receipt = GetReceiptSerializers()
+    class Meta:
+        model = Statement
+        fields = ['receipt']

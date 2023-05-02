@@ -9,7 +9,6 @@ from .serializers import *
 from .models import *
 from .sms import smsVerification
 
-
 @api_view(['POST'])
 def registration_view(request):
     account_serializer = PhoneSerializer(data=request.data)
