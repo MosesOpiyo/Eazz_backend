@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'Authentication',
     'Receipts',
     'rest_auth',
+    'Mpesa'
 ]
 
 MIDDLEWARE = [

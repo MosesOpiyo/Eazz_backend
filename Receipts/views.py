@@ -8,6 +8,7 @@ from .serializers import *
 from .models import *
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def receipt_view(request):
     receipt_serializer = ReceiptSerializers(data=request.data)
     data = {}
@@ -27,6 +28,7 @@ def receipt_view(request):
         return Response(status=status.HTTP_204_NO_CONTENT) 
 
 @api_view(['GET']) 
+@permission_classes([IsAuthenticated])
 def get_receipts(request):
     data = {}
     receipt = Receipt.objects.all()
@@ -34,17 +36,27 @@ def get_receipts(request):
     return Response(data,status = status.HTTP_200_OK)
 
 @api_view(['GET']) 
+@permission_classes([IsAuthenticated])
 def get_user_receipts(request,id):
     data = {}
     receipts = Receipt.objects.get(id=id)
     data =  GetReceiptSerializers(receipts).data
     return Response(data,status = status.HTTP_200_OK)
 
-@api_view(['GET']) 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated]) 
 def get_statements(request):
     data = {}
-    statements = Statement.objects.filter(code=request.user.id)
+    statements = Statement.objects.filter(code=request.user.id).order_by("-id")
     data =  GetStatementsSerializers(statements,many=True).data
+    return Response(data,status = status.HTTP_200_OK)
+
+@api_view(['GET']) 
+@permission_classes([IsAuthenticated])
+def latest_statements(request):
+    data = {}
+    statements = Statement.objects.filter(code=request.user.id).latest("id")
+    data =  GetStatementsSerializers(statements).data
     return Response(data,status = status.HTTP_200_OK)
 
    
