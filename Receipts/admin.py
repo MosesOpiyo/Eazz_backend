@@ -3,4 +3,3 @@ from .models import *
 # Register your models here.
 admin.site.register(Receipt),
 admin.site.register(Item),
-admin.site.register(Statement)

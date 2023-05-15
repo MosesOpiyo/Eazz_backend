@@ -7,6 +7,8 @@ import json
 from . credentials import MpesaAccessToken, LipanaMpesaPpassword
 from decouple import config
 
+from Authentication.models import Account
+
 @api_view(['GET']) 
 @permission_classes([IsAuthenticated])
 def getAccessToken(request):
@@ -24,7 +26,9 @@ def getAccessToken(request):
 @api_view(['GET']) 
 @permission_classes([IsAuthenticated])
 def lipa_na_mpesa_online(request):
+    account = Account.objects.get(phone_number=request.user.phone_number)
     access_token = MpesaAccessToken.validated_mpesa_access_token
+    print('Payment processing')
     api_url = config('SAF_STK_PUSH_API')
     headers = {"Authorization": "Bearer %s" % access_token}
     request = {
@@ -33,9 +37,9 @@ def lipa_na_mpesa_online(request):
         "Timestamp": LipanaMpesaPpassword.lipa_time,
         "TransactionType": "CustomerPayBillOnline",
         "Amount": 1,
-        "PartyA": request.user.phone_number,
-        "PartyB": LipanaMpesaPpassword.Business_short_code,
-        "PhoneNumber": request.user.phone_number,
+        "PartyA": 254110464540,
+        "PartyB": 174379,
+        "PhoneNumber": 254110464540,
         "CallBackURL": "https://sandbox.safaricom.co.ke/mpesa/",
         "AccountReference": "Account",
         "TransactionDesc": "Testing stk push"

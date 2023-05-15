@@ -18,7 +18,7 @@ class MpesaAccessToken:
 
 class LipanaMpesaPpassword:
     lipa_time = datetime.now().strftime('%Y%m%d%H%M%S')
-    Business_short_code = "174379"
+    Business_short_code = '174379'
     OffSetValue = '0'
     passkey = config('SAF_PASS_KEY')
 
